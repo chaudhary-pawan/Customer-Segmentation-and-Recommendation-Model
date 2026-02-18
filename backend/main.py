@@ -26,8 +26,8 @@ def startup_event():
     rec_scaler = models["rec_scaler"]
 
     project_root = Path(__file__).resolve().parents[1]
-    data_path = project_root / "customer_recommendations.csv"
-    raw_data_path = project_root / "customer_segmentation_data.csv"
+    data_path = project_root / "data" / "customer_recommendations.csv"
+    raw_data_path = project_root / "data" / "customer_segmentation_data.csv"
 
     routes.RECOMMENDATIONS_CSV_PATH = data_path
 
@@ -74,3 +74,11 @@ app.include_router(routes.router)
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+@app.get("/about")
+def about():
+    return {
+        "app": "Customer Segmentation & Recommendations API",
+        "version": "1.0.0",
+        "description": "API for customer segmentation and product recommendations based on KMeans clustering."
+    }
