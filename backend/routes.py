@@ -1,3 +1,4 @@
+from operator import index
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 import pandas as pd
@@ -97,6 +98,8 @@ def recommend_new(payload: dict):
         "similarity_score": similarity,
         "recommended_products": top_products,
     }
+
+
 
 @router.get("/download-recommendations")
 def download_recommendations():
