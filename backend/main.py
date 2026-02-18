@@ -10,11 +10,7 @@ from . import routes
 
 app = FastAPI(title="Customer Segmentation & Recommendations", version="1.0.0")
 
-# Mount frontend static files at root so assets load at their relative paths
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-app.mount("/", StaticFiles(directory=PROJECT_ROOT / "frontend", html=True), name="frontend")
-
-
+# CORS middleware — must be added before routes
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,6 +18,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 @app.on_event("startup")
 def startup_event():
@@ -43,10 +41,10 @@ def startup_event():
     # Expected feature columns (authoritative)
     cluster_feature_cols = list(rec_scaler.feature_names_in_)
     cluster_input_cols = cluster_feature_cols.copy()
-    product_cols = ["Wines", "Fruits", "Meat", "Fish", "Sweets", "Gold"]  # adjust if different
+    product_cols = ["Wines", "Fruits", "Meat", "Fish", "Sweets", "Gold"]
     rec_features = ["Clusters"] + cluster_feature_cols
 
-    # Optional rename map: adjust if your CSV uses these alt names
+    # Optional rename map
     rename_map = {
         "MntWines": "Wines",
         "MntFruits": "Fruits",
@@ -76,14 +74,13 @@ def startup_event():
     routes.REC_FEATURES = rec_features
     routes.CLUSTER_INPUT_COLS = cluster_input_cols
 
+# Include API routes FIRST — before any static file mount
 app.include_router(routes.router)
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
-
-# Root and static files are served by StaticFiles mounted at '/'
 @app.get("/about")
 def about():
     return {
@@ -92,10 +89,10 @@ def about():
         "description": "API for customer segmentation and product recommendations based on KMeans clustering."
     }
 
-@app.get("/about")
-def about():
-    return {
-        "app": "Customer Segmentation & Recommendations API",
-        "version": "1.0.0",
-        "description": "API for customer segmentation and product recommendations based on KMeans clustering."
-    }
+# Serve the frontend index.html at root "/"
+@app.get("/")
+def serve_frontend():
+    return FileResponse(PROJECT_ROOT / "frontend" / "index.html")
+
+# Mount static assets (JS, CSS) at /static so they don't conflict with API routes
+app.mount("/static", StaticFiles(directory=PROJECT_ROOT / "frontend"), name="static")
