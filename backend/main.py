@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 from pathlib import Path
@@ -7,6 +9,11 @@ from .models import load_models
 from . import routes
 
 app = FastAPI(title="Customer Segmentation & Recommendations", version="1.0.0")
+
+# Mount frontend static files at root so assets load at their relative paths
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+app.mount("/", StaticFiles(directory=PROJECT_ROOT / "frontend", html=True), name="frontend")
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -74,6 +81,16 @@ app.include_router(routes.router)
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+# Root and static files are served by StaticFiles mounted at '/'
+@app.get("/about")
+def about():
+    return {
+        "app": "Customer Segmentation & Recommendations API",
+        "version": "1.0.0",
+        "description": "API for customer segmentation and product recommendations based on KMeans clustering."
+    }
 
 @app.get("/about")
 def about():
