@@ -1,64 +1,1112 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Customer Segmentation &amp; Recommendations</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    /* ---- RESET ---- */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      font-size: 16px
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #0b0f1e;
+      color: #e2e8f0;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none
+    }
+
+    input[type=number] {
+      -moz-appearance: textfield
+    }
+
+    /* ---- BACKGROUND ---- */
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: .15
+    }
+
+    .o1 {
+      width: 550px;
+      height: 550px;
+      background: #3b82f6;
+      top: -200px;
+      left: -200px
+    }
+
+    .o2 {
+      width: 450px;
+      height: 450px;
+      background: #8b5cf6;
+      bottom: -100px;
+      right: -100px
+    }
+
+    .o3 {
+      width: 400px;
+      height: 400px;
+      background: #10b981;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%)
+    }
+
+    /* ---- LAYOUT ---- */
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem
+    }
+
+    /* ---- HERO ---- */
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem 2rem
+    }
+
+    .badge {
+      display: inline-block;
+      padding: .3rem 1rem;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 999px;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 0 20px rgba(59, 130, 246, .4);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.8rem, 4.5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.03em;
+      margin-bottom: .7rem
+    }
+
+    .grad {
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text
+    }
+
+    .hero-sub {
+      color: #6b7280;
+      font-size: .9rem;
+      letter-spacing: .04em;
+      margin-bottom: 1.75rem
+    }
+
+    .stats {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 14px;
+      padding: .8rem 1.5rem;
+      gap: 0;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 0 1.25rem
+    }
+
+    .stat-n {
+      display: block;
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text
+    }
+
+    .stat-l {
+      font-size: .65rem;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: .06em
+    }
+
+    .sdiv {
+      width: 1px;
+      height: 32px;
+      background: rgba(255, 255, 255, .1)
+    }
+
+    /* ---- TABS ---- */
+    .tabs {
+      display: flex;
+      gap: .4rem;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .09);
+      border-radius: 14px;
+      padding: .35rem;
+      margin-bottom: 1.5rem
+    }
+
+    .tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .45rem;
+      padding: .7rem 1rem;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: #6b7280;
+      font-family: inherit;
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .22s
+    }
+
+    .tab svg {
+      width: 15px;
+      height: 15px
+    }
+
+    .tab:hover {
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, .06)
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(59, 130, 246, .35)
+    }
+
+    /* ---- TAB PANELS ---- */
+    .panel {
+      display: none;
+      animation: fi .3s ease
+    }
+
+    .panel.active {
+      display: block
+    }
+
+    @keyframes fi {
+      from {
+        opacity: 0;
+        transform: translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* ---- GLASS CARD ---- */
+    .card {
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .09);
+      border-radius: 18px;
+      padding: 1.6rem;
+      transition: border-color .2s;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, .14)
+    }
+
+    .card-hdr {
+      display: flex;
+      align-items: flex-start;
+      gap: .9rem;
+      margin-bottom: 1.4rem
+    }
+
+    .cicon {
+      width: 42px;
+      height: 42px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .cicon svg {
+      width: 19px;
+      height: 19px
+    }
+
+    .ci-blue {
+      background: rgba(59, 130, 246, .18);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, .28)
+    }
+
+    .ci-green {
+      background: rgba(16, 185, 129, .18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, .28)
+    }
+
+    .ci-purple {
+      background: rgba(139, 92, 246, .18);
+      color: #a78bfa;
+      border: 1px solid rgba(139, 92, 246, .28)
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: .15rem
+    }
+
+    .card-desc {
+      font-size: .78rem;
+      color: #6b7280;
+      line-height: 1.5
+    }
+
+    /* ---- FORMS ---- */
+    .form-grp {
+      margin-bottom: 1.2rem
+    }
+
+    .flabel {
+      display: block;
+      font-size: .72rem;
+      font-weight: 600;
+      color: #9ca3af;
+      margin-bottom: .35rem;
+      text-transform: uppercase;
+      letter-spacing: .05em
+    }
+
+    .finput {
+      width: 100%;
+      padding: .7rem .95rem;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 9px;
+      color: #e2e8f0;
+      font-family: inherit;
+      font-size: .95rem;
+      font-weight: 500;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .finput::placeholder {
+      color: #4b5563;
+      font-weight: 400
+    }
+
+    .finput:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, .15);
+      background: rgba(255, 255, 255, .08)
+    }
+
+    /* Small inputs grid */
+    .fsec {
+      margin-bottom: 1.4rem
+    }
+
+    .fsec-title {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: #9ca3af;
+      margin-bottom: .65rem;
+      padding-bottom: .35rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .07)
+    }
+
+    .fsec-hint {
+      font-weight: 400;
+      opacity: .6;
+      font-size: .65rem
+    }
+
+    .fgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+      gap: .65rem
+    }
+
+    .fitem label {
+      display: block;
+      font-size: .68rem;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: .22rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .fitem input {
+      width: 100%;
+      padding: .5rem .7rem;
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-family: inherit;
+      font-size: .85rem;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .fitem input::placeholder {
+      color: #4b5563;
+      font-size: .72rem
+    }
+
+    .fitem input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, .15);
+      background: rgba(255, 255, 255, .07)
+    }
+
+    /* auto derived preview */
+    .auto-bar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .6rem;
+      background: rgba(16, 185, 129, .07);
+      border: 1px solid rgba(16, 185, 129, .18);
+      border-radius: 9px;
+      padding: .65rem 1rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .auto-tag {
+      font-size: .65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: #34d399;
+      flex-shrink: 0
+    }
+
+    .achip {
+      font-size: .72rem;
+      color: #9ca3af;
+      background: rgba(16, 185, 129, .07);
+      border: 1px solid rgba(16, 185, 129, .13);
+      border-radius: 999px;
+      padding: .18rem .65rem
+    }
+
+    .achip b {
+      color: #34d399
+    }
+
+    /* ---- BUTTONS ---- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .45rem;
+      padding: .78rem 1.4rem;
+      border: none;
+      border-radius: 9px;
+      font-family: inherit;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      width: 100%;
+    }
+
+    .btn svg {
+      width: 15px;
+      height: 15px;
+      transition: transform .2s
+    }
+
+    .btn:hover svg {
+      transform: translateX(3px)
+    }
+
+    .btn-blue {
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(59, 130, 246, .32)
+    }
+
+    .btn-blue:hover {
+      box-shadow: 0 6px 22px rgba(59, 130, 246, .48);
+      transform: translateY(-1px)
+    }
+
+    .btn-green {
+      background: linear-gradient(135deg, #10b981, #3b82f6);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, .32)
+    }
+
+    .btn-green:hover {
+      box-shadow: 0 6px 22px rgba(16, 185, 129, .48);
+      transform: translateY(-1px)
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, .12);
+      color: #9ca3af;
+      width: auto;
+      padding: .5rem 1rem;
+      font-size: .8rem
+    }
+
+    .btn-outline:hover {
+      border-color: #8b5cf6;
+      color: #a78bfa;
+      background: rgba(139, 92, 246, .08)
+    }
+
+    /* ---- LAYOUTS ---- */
+    .two-col {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 1.4rem;
+      align-items: start
+    }
+
+    .new-layout {
+      display: grid;
+      grid-template-columns: 1fr 370px;
+      gap: 1.4rem;
+      align-items: start
+    }
+
+    .form-scroll {
+      max-height: 82vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, .08) transparent
+    }
+
+    .result-side {
+      animation: fi .3s ease
+    }
+
+    /* ---- RESULT CARD ---- */
+    .rcard {
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .09);
+      border-radius: 18px;
+      overflow: hidden
+    }
+
+    .rcard-hdr {
+      padding: 1.1rem 1.4rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .07);
+      display: flex;
+      align-items: center;
+      gap: .8rem
+    }
+
+    .cbadge {
+      padding: .28rem .85rem;
+      border-radius: 999px;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: #fff
+    }
+
+    .rcard-body {
+      padding: 1.4rem
+    }
+
+    /* similarity */
+    .sim-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: .45rem
+    }
+
+    .sim-lbl {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #6b7280
+    }
+
+    .sim-val {
+      font-size: .95rem;
+      font-weight: 800
+    }
+
+    .sim-track {
+      height: 7px;
+      background: rgba(255, 255, 255, .07);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: .4rem
+    }
+
+    .sim-fill {
+      height: 100%;
+      border-radius: 999px;
+      width: 0;
+      transition: width .85s cubic-bezier(.34, 1.56, .64, 1)
+    }
+
+    .slbadge {
+      display: inline-block;
+      padding: .18rem .65rem;
+      border-radius: 999px;
+      font-size: .67rem;
+      font-weight: 700;
+      letter-spacing: .05em
+    }
+
+    .sc-vh {
+      color: #34d399
+    }
+
+    .sc-h {
+      color: #60a5fa
+    }
+
+    .sc-m {
+      color: #fbbf24
+    }
+
+    .sc-l {
+      color: #fb923c
+    }
+
+    .sc-vl {
+      color: #f87171
+    }
+
+    .sb-vh {
+      background: rgba(52, 211, 153, .12);
+      color: #34d399;
+      border: 1px solid rgba(52, 211, 153, .28)
+    }
+
+    .sb-h {
+      background: rgba(96, 165, 250, .12);
+      color: #60a5fa;
+      border: 1px solid rgba(96, 165, 250, .28)
+    }
+
+    .sb-m {
+      background: rgba(251, 191, 36, .12);
+      color: #fbbf24;
+      border: 1px solid rgba(251, 191, 36, .28)
+    }
+
+    .sb-l {
+      background: rgba(251, 146, 60, .12);
+      color: #fb923c;
+      border: 1px solid rgba(251, 146, 60, .28)
+    }
+
+    .sb-vl {
+      background: rgba(248, 113, 113, .12);
+      color: #f87171;
+      border: 1px solid rgba(248, 113, 113, .28)
+    }
+
+    .sf-vh {
+      background: linear-gradient(90deg, #34d399, #10b981)
+    }
+
+    .sf-h {
+      background: linear-gradient(90deg, #60a5fa, #3b82f6)
+    }
+
+    .sf-m {
+      background: linear-gradient(90deg, #fbbf24, #f59e0b)
+    }
+
+    .sf-l {
+      background: linear-gradient(90deg, #fb923c, #f97316)
+    }
+
+    .sf-vl {
+      background: linear-gradient(90deg, #f87171, #ef4444)
+    }
+
+    /* product chips */
+    .prod-title {
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #6b7280;
+      margin: 1.1rem 0 .6rem
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .45rem .9rem;
+      border-radius: 999px;
+      font-size: .82rem;
+      font-weight: 600;
+      animation: pop .3s ease forwards;
+      opacity: 0
+    }
+
+    .chip:nth-child(1) {
+      animation-delay: .08s
+    }
+
+    .chip:nth-child(2) {
+      animation-delay: .16s
+    }
+
+    .chip:nth-child(3) {
+      animation-delay: .24s
+    }
+
+    @keyframes pop {
+      from {
+        opacity: 0;
+        transform: scale(.82) translateY(4px)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0)
+      }
+    }
+
+    .cp-wines {
+      background: rgba(239, 68, 68, .13);
+      border: 1px solid rgba(239, 68, 68, .25);
+      color: #fca5a5
+    }
+
+    .cp-fruits {
+      background: rgba(245, 158, 11, .13);
+      border: 1px solid rgba(245, 158, 11, .25);
+      color: #fcd34d
+    }
+
+    .cp-meat {
+      background: rgba(217, 119, 6, .13);
+      border: 1px solid rgba(217, 119, 6, .25);
+      color: #fbbf24
+    }
+
+    .cp-fish {
+      background: rgba(59, 130, 246, .13);
+      border: 1px solid rgba(59, 130, 246, .25);
+      color: #93c5fd
+    }
+
+    .cp-sweets {
+      background: rgba(236, 72, 153, .13);
+      border: 1px solid rgba(236, 72, 153, .25);
+      color: #f9a8d4
+    }
+
+    .cp-gold {
+      background: rgba(251, 191, 36, .13);
+      border: 1px solid rgba(251, 191, 36, .25);
+      color: #fde68a
+    }
+
+    .cp-def {
+      background: rgba(139, 92, 246, .13);
+      border: 1px solid rgba(139, 92, 246, .25);
+      color: #c4b5fd
+    }
+
+    /* derived mini grid */
+    .der-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: .5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, .07)
+    }
+
+    .der-item {
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid rgba(255, 255, 255, .07);
+      border-radius: 8px;
+      padding: .55rem .75rem
+    }
+
+    .der-k {
+      font-size: .62rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #6b7280
+    }
+
+    .der-v {
+      font-size: .9rem;
+      font-weight: 700;
+      color: #34d399
+    }
+
+    /* warning */
+    .warn {
+      margin-top: .9rem;
+      background: rgba(245, 158, 11, .08);
+      border: 1px solid rgba(245, 158, 11, .22);
+      border-radius: 8px;
+      padding: .65rem .9rem;
+      font-size: .78rem;
+      color: #fcd34d;
+      display: flex;
+      gap: .5rem
+    }
+
+    /* ---- CSV TABLE ---- */
+    .tw {
+      overflow: auto;
+      max-height: 58vh;
+      border-radius: 9px;
+      margin-top: 1rem;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, .08) transparent
+    }
+
+    .dtable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .78rem
+    }
+
+    .dtable th {
+      padding: .65rem .9rem;
+      text-align: left;
+      font-size: .65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #6b7280;
+      background: rgba(255, 255, 255, .04);
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      position: sticky;
+      top: 0;
+      white-space: nowrap
+    }
+
+    .dtable td {
+      padding: .55rem .9rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .04);
+      color: #9ca3af;
+      white-space: nowrap
+    }
+
+    .dtable tr:hover td {
+      background: rgba(255, 255, 255, .03)
+    }
+
+    /* empty */
+    .empty {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #4b5563
+    }
+
+    .empty svg {
+      width: 44px;
+      height: 44px;
+      margin-bottom: .9rem;
+      opacity: .25;
+      display: block;
+      margin: 0 auto .9rem
+    }
+
+    /* loader */
+    .loader-ov {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 15, 30, .75);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .spin {
+      width: 42px;
+      height: 42px;
+      border: 3px solid rgba(255, 255, 255, .1);
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: sp .7s linear infinite
+    }
+
+    @keyframes sp {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    /* ml-auto */
+    .mla {
+      margin-left: auto
+    }
+
+    /* responsive */
+    @media(max-width:860px) {
+
+      .two-col,
+      .new-layout {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:560px) {
+      .fgrid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .hero h1 {
+        font-size: 1.7rem
+      }
+
+      .stats {
+        flex-direction: column
+      }
+
+      .sdiv {
+        display: none
+      }
+    }
+  </style>
 </head>
-<body class="bg-light">
-  <div class="container py-4">
-    <h1 class="mb-4">Customer Segmentation &amp; Recommendations</h1>
 
-    <div class="row g-4">
-      <!-- Existing customer -->
-      <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">Existing Customer</h5>
-            <div class="mb-3">
-              <label class="form-label">Customer Index</label>
-              <input id="existing-index" type="number" class="form-control" min="0" />
+<body>
+
+  <div class="bg">
+    <div class="orb o1"></div>
+    <div class="orb o2"></div>
+    <div class="orb o3"></div>
+  </div>
+
+  <div class="app">
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="badge">AI-Powered</div>
+      <h1>Customer Segmentation<br><span class="grad">&amp; Recommendations</span></h1>
+      <p class="hero-sub">KMeans clustering &nbsp;&middot;&nbsp; Cosine similarity &nbsp;&middot;&nbsp; Real-time
+        inference</p>
+      <div class="stats">
+        <div class="stat"><span class="stat-n">4</span><span class="stat-l">Clusters</span></div>
+        <div class="sdiv"></div>
+        <div class="stat"><span class="stat-n">6</span><span class="stat-l">Products</span></div>
+        <div class="sdiv"></div>
+        <div class="stat"><span class="stat-n">20</span><span class="stat-l">Features</span></div>
+      </div>
+    </header>
+
+    <!-- TABS -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="existing">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 20c0-4 3.58-7 8-7s8 3 8 7" />
+        </svg>
+        Existing Customer
+      </button>
+      <button class="tab" data-tab="new">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="8" r="4" />
+          <line x1="12" y1="20" x2="12" y2="14" />
+          <line x1="9" y1="17" x2="15" y2="17" />
+        </svg>
+        New Customer
+      </button>
+      <button class="tab" data-tab="csv">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="3" y1="9" x2="21" y2="9" />
+          <line x1="3" y1="15" x2="21" y2="15" />
+          <line x1="9" y1="9" x2="9" y2="21" />
+        </svg>
+        Saved Recommendations
+      </button>
+    </nav>
+
+    <!-- PANEL: EXISTING CUSTOMER -->
+    <section class="panel active" id="panel-existing">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="cicon ci-blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.58-7 8-7s8 3 8 7" />
+              </svg>
             </div>
-            <button id="btn-existing" class="btn btn-primary w-100">Get Recommendations</button>
-            <pre id="existing-result" class="mt-3 small bg-light p-2 rounded border"></pre>
+            <div>
+              <div class="card-title">Lookup Customer</div>
+              <div class="card-desc">Enter a customer index to get personalised recommendations.</div>
+            </div>
           </div>
+          <div class="form-grp">
+            <label class="flabel" for="existing-index">Customer Index</label>
+            <input id="existing-index" type="number" min="0" class="finput" placeholder="e.g. 54" />
+          </div>
+          <button class="btn btn-blue" id="btn-existing">
+            Get Recommendations
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+        </div>
+        <div id="existing-result-panel" style="display:none">
+          <div id="existing-result-content"></div>
         </div>
       </div>
+    </section>
 
-      <!-- New customer -->
-      <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">New Customer</h5>
-            <div id="new-customer-form" class="row g-2">
-              <!-- Fields injected by JS -->
+    <!-- PANEL: NEW CUSTOMER -->
+    <section class="panel" id="panel-new">
+      <div class="new-layout">
+        <div class="card form-scroll">
+          <div class="card-hdr">
+            <div class="cicon ci-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="4" />
+                <line x1="12" y1="20" x2="12" y2="14" />
+                <line x1="9" y1="17" x2="15" y2="17" />
+              </svg>
             </div>
-            <button id="btn-new" class="btn btn-success w-100 mt-2">Recommend</button>
-            <pre id="new-result" class="mt-3 small bg-light p-2 rounded border"></pre>
-          </div>
-        </div>
-      </div>
-
-      <!-- CSV viewer -->
-      <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">Saved Recommendations</h5>
-            <button id="btn-load-csv" class="btn btn-secondary w-100">Load CSV</button>
-            <div class="table-responsive mt-3" style="max-height: 320px; overflow-y: auto;">
-              <table class="table table-sm table-striped">
-                <thead id="csv-head"></thead>
-                <tbody id="csv-body"></tbody>
-              </table>
+            <div>
+              <div class="card-title">New Customer</div>
+              <div class="card-desc">Fill in details. Spent, Family Size &amp; Is_Parent are auto-calculated.</div>
             </div>
           </div>
+          <div class="fsec">
+            <div class="fsec-title">Demographics</div>
+            <div class="fgrid" id="demo-fields"></div>
+          </div>
+          <div class="fsec">
+            <div class="fsec-title">Product Spend <span class="fsec-hint">(last 2 years)</span></div>
+            <div class="fgrid" id="spend-fields"></div>
+          </div>
+          <div class="fsec">
+            <div class="fsec-title">Purchase Behaviour</div>
+            <div class="fgrid" id="behaviour-fields"></div>
+          </div>
+          <div class="auto-bar">
+            <span class="auto-tag">Auto-calc</span>
+            <span class="achip">Spent: <b id="p-spent">0</b></span>
+            <span class="achip">Children: <b id="p-children">0</b></span>
+            <span class="achip">Family Size: <b id="p-family">1</b></span>
+            <span class="achip">Is Parent: <b id="p-parent">No</b></span>
+          </div>
+          <button class="btn btn-green" id="btn-new">
+            Recommend Products
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+        </div>
+        <div id="new-result-panel" class="result-side" style="display:none">
+          <div id="new-result-content"></div>
         </div>
       </div>
-    </div>
+    </section>
+
+    <!-- PANEL: CSV -->
+    <section class="panel" id="panel-csv">
+      <div class="card">
+        <div class="card-hdr">
+          <div class="cicon ci-purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <line x1="3" y1="9" x2="21" y2="9" />
+              <line x1="3" y1="15" x2="21" y2="15" />
+              <line x1="9" y1="9" x2="9" y2="21" />
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Saved Recommendations</div>
+            <div class="card-desc">Pre-generated recommendation records for all customers.</div>
+          </div>
+          <button class="btn btn-outline mla" id="btn-load-csv">Load Data</button>
+        </div>
+        <div id="csv-empty" class="empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <line x1="3" y1="9" x2="21" y2="9" />
+            <line x1="3" y1="15" x2="21" y2="15" />
+            <line x1="9" y1="9" x2="9" y2="21" />
+          </svg>
+          <p>Click "Load Data" to view recommendations</p>
+        </div>
+        <div class="tw" id="csv-wrapper" style="display:none">
+          <table class="dtable">
+            <thead id="csv-head"></thead>
+            <tbody id="csv-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /app -->
+
+  <!-- LOADER -->
+  <div class="loader-ov" id="loader" style="display:none">
+    <div class="spin"></div>
   </div>
 
   <script src="/static/app.js"></script>
 </body>
+
 </html>
