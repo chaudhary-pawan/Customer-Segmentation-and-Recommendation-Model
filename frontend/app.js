@@ -1,5 +1,5 @@
-// Adjust to your backend host/port
-const API_BASE = "http://127.0.0.1:8000";
+// API base — all endpoints are now under /api
+const API_BASE = "";  // same origin, use relative paths
 
 const fieldMeta = [
   { name: "Education", hint: "Categorical/ordinal code (e.g., 0–4)" },
@@ -27,8 +27,6 @@ const fieldMeta = [
   { name: "Is_Parent", hint: "Parent flag (0/1)" },
 ];
 
-const clusterInputCols = fieldMeta.map((f) => f.name);
-
 // Build dynamic form with hints
 const formContainer = document.getElementById("new-customer-form");
 fieldMeta.forEach(({ name, hint }) => {
@@ -53,7 +51,7 @@ document.getElementById("btn-existing").onclick = async () => {
   }
   existingResultEl.textContent = "Loading...";
   try {
-    const res = await fetch(`${API_BASE}/recommend-existing`, {
+    const res = await fetch(`/api/recommend-existing`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ customer_index: idx }),
@@ -73,7 +71,7 @@ document.getElementById("btn-new").onclick = async () => {
   });
   newResultEl.textContent = "Loading...";
   try {
-    const res = await fetch(`${API_BASE}/recommend-new`, {
+    const res = await fetch(`/api/recommend-new`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -91,7 +89,7 @@ document.getElementById("btn-load-csv").onclick = async () => {
   headEl.innerHTML = "";
   bodyEl.innerHTML = "";
   try {
-    const res = await fetch(`${API_BASE}/download-recommendations`);
+    const res = await fetch(`/api/download-recommendations`);
     const rows = await res.json();
     if (!rows || rows.length === 0) {
       headEl.innerHTML = "<tr><th>No data</th></tr>";
