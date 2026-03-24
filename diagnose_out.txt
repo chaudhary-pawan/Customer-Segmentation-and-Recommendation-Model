@@ -1,0 +1,119 @@
+venv\Scripts\python.e
+xe : 
+C:\Users\HP\Github Re
+po\Customer-Segmentat
+ion-and-Recommendatio
+n-Model\venv\Lib\site
+-packages\sklearn\uti
+ls\validation.py:2749
+: UserWarning: X 
+does not have valid 
+feature names, but 
+PCA was fitted with 
+feature names
+At line:1 char:1
++ venv\Scripts\python
+.exe diagnose.py 
+2>&1 | venv\Scripts\p
+ython.exe -c ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (C:\User   
+ s\HP\Git...h fea    
+ture names:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+  warnings.warn(
+C:\Users\HP\Github Re
+po\Customer-Segmentat
+ion-and-Recommendatio
+n-Model\venv\Lib\site
+-packages\sklearn\uti
+ls\validation.py:2749
+: UserWarning: X 
+does not have valid 
+feature names, but 
+KMeans was fitted 
+with feature names
+  warnings.warn(
+=== All cluster feature cols ===
+['Education', 'Income', 'Kidhome', 'Teenhome', 'Recency', 'Wines', 'Fruits', 'Meat', 'Fish', 'Sweets', 'Gold', 'NumDealsPurchases', 'NumWebPurchases', 'NumCatalogPurchases', 'NumStorePurchases', 'NumWebVisitsMonth', 'Customer_For', 'Age', 'Spent', 'Living_With', 'Children', 'Family_Size', 'Is_Parent']
+
+=== Non-product features used for cosine similarity ===
+['Education', 'Income', 'Kidhome', 'Teenhome', 'Recency', 'NumDealsPurchases', 'NumWebPurchases', 'NumCatalogPurchases', 'NumStorePurchases', 'NumWebVisitsMonth', 'Customer_For', 'Age', 'Spent', 'Living_With', 'Children', 'Family_Size', 'Is_Parent']
+
+=== Cluster product means ===
+               Wines     Fruits        Meat       Fish     Sweets       Gold
+Clusters                                                                    
+0         608.103516  64.638672  461.876953  95.683594  65.984375  74.037109
+1          34.919672   6.644262   25.867213  10.157377   6.742623  18.163934
+2         529.307002  33.617594  181.384201  44.384201  35.321364  71.490126
+3          89.722326   4.442777   30.354597   6.324578   4.232645  15.679174
+
+=== Real data stats for non-product features ===
+       Education     Income  Kidhome  Teenhome  Recency  NumDealsPurchases  NumWebPurchases  NumCatalogPurchases  NumStorePurchases  NumWebVisitsMonth  Customer_For      Age    Spent  Living_With  Children  Family_Size  Is_Parent
+count    2212.00    2212.00  2212.00   2212.00  2212.00            2212.00          2212.00              2212.00            2212.00            2212.00  2.212000e+03  2212.00  2212.00      2212.00   2212.00      2212.00    2212.00
+mean        0.61   51958.81     0.44      0.51    49.02               2.32             4.09                 2.67               5.81               5.32  3.056091e+16    52.09   607.27         0.65      0.95         2.59       0.71
+std         0.68   21527.28     0.54      0.54    28.94               1.92             2.74                 2.93               3.25               2.43  1.749556e+16    11.70   602.51         0.48      0.75         0.91       0.45
+min         0.00    1730.00     0.00      0.00     0.00               0.00             0.00                 0.00               0.00               0.00  0.000000e+00    25.00     5.00         0.00      0.00         1.00       0.00
+25%         0.00   35233.50     0.00      0.00    24.00               1.00             2.00                 0.00               3.00               3.00  1.555200e+16    44.00    69.00         0.00      0.00         2.00       0.00
+50%         0.00   51371.00     0.00      0.00    49.00               2.00             4.00                 2.00               5.00               6.00  3.075840e+16    51.00   397.00         1.00      1.00         3.00       1.00
+75%         1.00   68487.00     1.00      1.00    74.00               3.00             6.00                 4.00               8.00               7.00  4.570560e+16    62.00  1048.00         1.00      1.00         3.00       1.00
+max         2.00  162397.00     2.00      2.00    99.00              15.00            27.00                28.00              13.00              20.00  6.039360e+16    81.00  2525.00         1.00      3.00         5.00       1.00
+
+=== User input values ===
+  Education: 2
+  Income: 43000
+  Kidhome: 2
+  Teenhome: 1
+  Recency: 4
+  Wines: 340
+  Fruits: 65
+  Meat: 53
+  Fish: 34
+  Sweets: 65
+  Gold: 1094
+  NumDealsPurchases: 0
+  NumWebPurchases: 0
+  NumCatalogPurchases: 1
+  NumStorePurchases: 2
+  NumWebVisitsMonth: 0
+  Customer_For: 543
+  Age: 23
+  Spent: 8957
+  Living_With: 2
+  Children: 3
+  Family_Size: 5
+  Is_Parent: 1
+
+=== Cosine similarity to each centroid (non-product features) ===
+  Cluster 0: 0.129406
+  Cluster 1: -0.231387
+  Cluster 2: 0.087842
+  Cluster 3: -0.007773
+
+=== Predicted cluster: 2 ===
+
+=== Centroid non-product features (scaled) ===
+          Education    Income   Kidhome  Teenhome   Recency  NumDealsPurchases  NumWebPurchases  NumCatalogPurchases  NumStorePurchases  NumWebVisitsMonth  Customer_For       Age     Spent  Living_With  Children  Family_Size  Is_Parent
+Clusters                                                                                                                                                                                                                                   
+0         -0.066525  1.101641 -0.815477 -0.868678  0.005133          -0.640722         0.337587             1.112274           0.768021          -1.088551     -0.035548  0.066744  1.266741    -0.136914 -1.215072    -1.077160  -1.498994
+1          0.132084 -0.998813  0.526995 -0.821239 -0.021180          -0.272647        -0.683332            -0.731528          -0.812040           0.607004     -0.031943 -0.634311 -0.837968    -0.081558 -0.218808    -0.224015   0.138933
+2         -0.104407  0.457129 -0.431471  0.805814 -0.000237           0.697206         0.937032             0.381876           0.763810           0.081410      0.357003  0.276062  0.478498     0.046607  0.276045     0.252898   0.620533
+3          0.021847 -0.392843  0.631119  0.932233  0.019557           0.198914        -0.521461            -0.630313          -0.606612           0.265892     -0.302373  0.373340 -0.757851     0.176154  1.129142     1.026812   0.632456
+
+=== User non-product features (scaled) ===
+   Education    Income   Kidhome  Teenhome   Recency  NumDealsPurchases  NumWebPurchases  NumCatalogPurchases  NumStorePurchases  NumWebVisitsMonth  Customer_For       Age      Spent  Living_With  Children  Family_Size  Is_Parent
+0     2.0369 -0.416255  2.902796  0.908097 -1.555797          -1.208163        -1.491175             -0.57134           -1.17116           -2.19436     -1.747176 -2.486235  13.861302      2.83152  2.739158     2.656499   0.632456
+
+=== Sample similarity scores from REAL customers ===
+  Cluster 0: sims = [0.641, 0.736, 0.799, 0.808, 0.874]
+  Cluster 1: sims = [0.744, 0.778, 0.808, 0.622, 0.653]
+  Cluster 2: sims = [0.656, 0.623, 0.739, 0.182, 0.496]
+  Cluster 3: sims = [0.741, 0.112, 0.598, 0.619, 0.762]

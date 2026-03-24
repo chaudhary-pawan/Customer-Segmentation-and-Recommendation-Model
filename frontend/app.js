@@ -1,10 +1,14 @@
 // =============================================
-// API ENDPOINTS (same as before, no changes)
+// API ENDPOINTS (Dynamic URL for Render + Vercel)
 // =============================================
+const API_BASE_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+  ? "" // Local development (relative to frontend origin)
+  : "https://customer-segmentation-api.onrender.com"; // UPDATE THIS with your actual Render URL
+
 const API = {
-  existingCustomer: "/api/recommend-existing",
-  newCustomer: "/api/recommend-new",
-  downloadCsv: "/api/download-recommendations",
+  existingCustomer: `${API_BASE_URL}/api/recommend-existing`,
+  newCustomer: `${API_BASE_URL}/api/recommend-new`,
+  downloadCsv: `${API_BASE_URL}/api/download-recommendations`,
 };
 
 // =============================================
