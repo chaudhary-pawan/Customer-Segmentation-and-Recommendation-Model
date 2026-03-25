@@ -37,6 +37,8 @@ def startup_event():
     routes.RECOMMENDATIONS_CSV_PATH = data_path
 
     raw_data = pd.read_csv(raw_data_path)
+    recommendations_df = pd.read_csv(data_path)
+    routes.RECOMMENDATIONS_DF = recommendations_df.set_index("Customer_Index")
 
     cluster_feature_cols = list(rec_scaler.feature_names_in_)
     cluster_input_cols = cluster_feature_cols.copy()

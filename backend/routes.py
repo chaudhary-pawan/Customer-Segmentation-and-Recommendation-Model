@@ -17,6 +17,7 @@ RECOMMENDATIONS_CSV_PATH = None
 RAW_DATA = None            # Original data with needed cols
 REC_FEATURES = None
 CLUSTER_INPUT_COLS = None
+RECOMMENDATIONS_DF = None
 
 # Similarity threshold — lowered to 0.1 so more customers get recommendations.
 # Cosine similarity on a 16-dim scaled space is often low (0.05-0.7 is typical).
@@ -44,26 +45,26 @@ def _interpret_similarity(score: float) -> str:
 @router.post("/recommend-existing")
 def recommend_existing(payload: ExistingCustomerRequest):
     idx = payload.customer_index
-    if idx not in RAW_DATA.index:
+    if idx not in RECOMMENDATIONS_DF.index:
         raise HTTPException(status_code=404, detail="Customer index not found")
 
-    feature_cols = [c for c in CLUSTER_FEATURE_COLS if c not in PRODUCT_COLS]
-    customer_features = REC_SCALED.loc[[idx], feature_cols].values
-    cluster = int(REC_SCALED.loc[idx, "Clusters"])
-    centroid_features = REC_CENTROIDS.loc[cluster, feature_cols].values.reshape(1, -1)
-    similarity = float(cosine_similarity(customer_features, centroid_features)[0][0])
+    row = RECOMMENDATIONS_DF.loc[idx]
+    
+    # Parse recommended products from string "Prod1, Prod2, Prod3"
+    products_str = row["Recommended_Products"]
+    if pd.isna(products_str) or not str(products_str).strip() or str(products_str).strip().lower() == "no uplift product":
+        products = []
+    else:
+        products = [p.strip() for p in str(products_str).split(",")]
 
-    # Always compute uplift — even for low similarity, show best products
-    uplift = (CLUSTER_PRODUCT_MEANS.loc[cluster] - RAW_DATA.loc[idx, PRODUCT_COLS])
-    uplift = uplift[uplift > 0].sort_values(ascending=False)
-    top_products = list(uplift.head(3).index)
-
+    similarity = float(row["Similarity_Score"])
+    
     response = {
-        "customer_index": idx,
-        "cluster": cluster,
+        "customer_index": int(idx),
+        "cluster": int(row["Clusters"]),
         "similarity_score": round(similarity, 4),
         "similarity_level": _interpret_similarity(similarity),
-        "recommended_products": top_products,
+        "recommended_products": products,
     }
 
     if similarity < SIMILARITY_THRESHOLD:
@@ -137,7 +138,7 @@ def recommend_new(payload: dict):
     rec_row_scaled = rec_row.copy()
     rec_row_scaled[CLUSTER_INPUT_COLS] = rec_scaler.transform(rec_row_scaled[CLUSTER_INPUT_COLS])
 
-    feature_cols = [c for c in CLUSTER_INPUT_COLS if c not in PRODUCT_COLS]
+    feature_cols = CLUSTER_INPUT_COLS
     centroid_features = REC_CENTROIDS.loc[cluster, feature_cols].values.reshape(1, -1)
     similarity = float(cosine_similarity(rec_row_scaled[feature_cols], centroid_features)[0][0])
 
