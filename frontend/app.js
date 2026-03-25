@@ -3,7 +3,7 @@
 // =============================================
 const API_BASE_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
   ? "" // Local development (relative to frontend origin)
-  : "https://customer-segmentation-api.onrender.com"; // UPDATE THIS with your actual Render URL
+  : "https://product-recommender-system-lpvz.onrender.com"; // UPDATE THIS with your actual Render URL
 
 const API = {
   existingCustomer: `${API_BASE_URL}/api/recommend-existing`,
